@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  lb:
+    image: nginx:alpine
+    ports:
+      - "1080:1080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - warp
+  warp:
+    image: caomingjun/warp
+    restart: always
+    environment:
+      - WARP_SLEEP=2
+      - WARP_LICENSE_KEY=A7m2U6t9-98V2Jd6b-673zwT9k  # optional
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+    volumes:
+      - ./data:/var/lib/cloudflare-warp
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+      replicas: 4

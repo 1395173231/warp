@@ -20,10 +20,16 @@ services:
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-s", "https://dash.cloudflare.com/cdn-cgi/trace"]  # 静默模式下请求Google，如果成功返回2xx状态码
+      interval: 30s  # 每隔30秒检查一次
+      timeout: 10s   # 请求超时10秒
+      retries: 3     # 失败3次后标记为不健康
+      start_period: 5s  # 容器启动后等待5秒再开始检查
     #volumes:
     #  - ./data:/var/lib/cloudflare-warp
     deploy:
       resources:
         limits:
           memory: 150M
-      replicas: 4
+      replicas: 3
